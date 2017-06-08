@@ -1,3 +1,4 @@
+package DramaWorld;
 
 import java.sql.ResultSet;
 import java.sql.Connection;
@@ -49,7 +50,7 @@ public class Login {
 	// recommend부분 수정중
 	public boolean checkViewer(Connection server_connection){
 		
-		String ID,  PW, v_genre;
+		String ID,  PW, v_genre, v_id;
 		System.out.println("Insert ID: ");
 		ID = sc.nextLine();
 		System.out.println("Insert PW: ");
@@ -61,9 +62,11 @@ public class Login {
 				return false;
 	
 			else{
+				v_id = res.getString("id");
 				v_genre = res.getString("preference_genre");
 				Viewer viewer = new Viewer(server_connection);
 				viewer.popup(v_genre);
+				viewer.display(v_id);
 			}
 			
 		} catch (SQLException e) {
@@ -81,7 +84,7 @@ public class Login {
 		System.out.println("Insert PW: ");
 		PW = sc.nextLine();
 		try {
-			s.executeQuery("select * from Officer where id = '"+ID+"' AND password = '"+PW+"'");
+			s.executeQuery("select * from Officer where id = '"+ID+"' AND password = '"+PW+"' AND confirm = 'true'");
 			ResultSet res = s.getResultSet();
 			if(!res.next())
 				return false;

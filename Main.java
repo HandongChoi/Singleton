@@ -1,3 +1,4 @@
+package DramaWorld;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -83,12 +84,12 @@ public class Main {
 			if(loginSuccess){
 				if(user == 1){
 					Viewer viewer = new Viewer(server_connection);
-					viewer.display();
+					//viewer.display();
 				}
 				else if(user == 2){
 					Officer official = new Officer(server_connection);
 					official.display();
-				}
+					}
 				else if(user == 3){
 					Analyst analyst = new Analyst(server_connection);
 					analyst.display();

@@ -24,6 +24,12 @@ public class Officer {
 		}
 	}
 	
+	
+	public void checkInput(String input, String category)
+	{
+		
+	}
+	
 	public void display(){
 		Scanner sc = new Scanner(System.in);
 		boolean flag = true;
@@ -38,51 +44,160 @@ public class Officer {
 			menu = sc.nextLine();
 			
 			if(menu.equals("1")){
-				String title, writer, firstAired, lastAired, broadStation, runningTime, ageLimit, replaySite, genre, actors;
+				String title = null, writer= null, firstAired= null, lastAired= null, broadStation= null, runningTime= null;
+				String ageLimit= null, replaySite= null, genre, actors= null;
 				
-				System.out.println("Insert Drama title: ");
-				title = sc.nextLine();
-				System.out.println("Insert Drama writer: ");
-				writer = sc.nextLine();
-				System.out.println("Insert first aired date(2017-00-00): ");
-				firstAired = sc.nextLine();
-				System.out.println("Insert last aired date(2017-00-00): ");
-				lastAired = sc.nextLine();
-				System.out.println("Insert boradcasting station: ");
-				broadStation = sc.nextLine();
-				System.out.println("Insert running_time: ");
-				runningTime = sc.nextLine();
-				System.out.println("Insert age limit: ");
-				ageLimit = sc.nextLine();
-				System.out.println("Insert replaySite: ");
-				replaySite = sc.nextLine();
-				
-				//drama title, aired date
-				try {
-					s.executeUpdate("insert into Drama(title, writer, first_aired, last_aired, broad_station, "
-									+ "running_time, age_limit, replay_site_link) "
-									+ "values('"+title + "', '" + writer  + "', '"+firstAired  + "', '"+lastAired  + "', '" 
-									+ broadStation  + "', " + runningTime  +", '" +ageLimit   +"', '"+ replaySite+ "')");
-				} catch (SQLException e1) {
-					if(e1.getErrorCode() == 1292){
-						System.out.println("Please check input data");
-						continue;
+				do
+				{
+					try{
+						System.out.println("Insert Drama title(blank is not allowed): ");
+						title = sc.nextLine();
+						//checkInput(title, "text");
+						//System.out.println("")
+						s.executeUpdate("insert into Drama(title)" + "values('"+title + "')");
+					}catch(SQLException e1)
+					{
+						System.out.println("Please check input again");
+					//	System.out.println(e1.getMessage());
+						title = null;
 					}
-					//System.out.println(e1.getErrorCode());
-					//System.out.println(e1.getMessage());
+				}while(title == null || title.length() <= 0);
+				
+				do
+				{
+					try{
+						System.out.println("Insert Drama writer(blank is not allowed): ");
+						writer = sc.nextLine();
+						//checkInput(title, "text");
+						//System.out.println("")
+						s.executeUpdate("update Drama set writer = " + "' " + writer +"' where title = '" + title+"'");
+					}catch(SQLException e1)
+					{
+						System.out.println("Please check input again");
+						//System.out.println(e1.getMessage());
+						writer = null;
+					}
+				}while(writer == null || writer.length() <= 0);
 					
+				boolean flagInput = true;
+				while(flagInput)
+				{
+					try{
+						System.out.println("Insert first aired date(2017-00-00): ");
+						firstAired = sc.nextLine();
+						s.executeUpdate("update Drama set first_aired = " + "' " + firstAired +"' where title = '" + title+"'");
+						flagInput = false;
+					}catch(SQLException e1)
+					{
+						System.out.println("Please check input again");
+					//	System.out.println(e1.getMessage());
+					}
 				}
 				
-				System.out.println("Insert Genre(q: quit): ");
-				genre = sc.nextLine();
-				while(!genre.equalsIgnoreCase("q")){
+				flagInput = true;
+				while(flagInput)
+				{
+					try{
+						System.out.println("Insert last aired date(2017-00-00): ");
+						lastAired = sc.nextLine();
+						s.executeUpdate("update Drama set last_aired = " + "' " + lastAired +"' where title = '" + title+"'");
+						flagInput = false;
+					}catch(SQLException e1)
+					{
+						System.out.println("Please check input again");
+						//System.out.println(e1.getMessage());
+					}
+				}
+				
+				do
+				{
+					try{
+						System.out.println("Insert boradcasting station: blank is not allowed)");
+						broadStation = sc.nextLine();
+						s.executeUpdate("update Drama set broad_station = " + "' " + broadStation +"' where title = '" + title+"'");
+					}catch(SQLException e1)
+					{
+						System.out.println("Please check input again");
+						//System.out.println(e1.getMessage());
+						broadStation = null;
+					}
+				}while(broadStation == null || broadStation.length() <= 0);
+				
+				
+				do
+				{
+					try{
+						System.out.println("Insert running_time(blank is not allowed): ");
+						runningTime = sc.nextLine();
+						s.executeUpdate("update Drama set running_time = " +  runningTime + " where title = '" + title+"'");
+					}catch(SQLException e1)
+					{
+						System.out.println("Please check input again");
+						System.out.println(e1.getMessage());
+						runningTime = null;
+					}
+				}while(runningTime == null || runningTime.length() <= 0);
+				
+				flagInput = true;
+				while(flagInput)
+				{
+					try{
+						
+						System.out.println("Insert age limit(blank is not allowed): ");
+						ageLimit = sc.nextLine();
+						s.executeUpdate("update Drama set age_limit = " + "'" + ageLimit +"' where title = '" + title+"'");
+						flagInput = false;
+					}catch(SQLException e1)
+					{
+						System.out.println("Please check input again");
+						//System.out.println(e1.getMessage());
+					}
+				}
+				
+				do
+				{
+					try{
+						System.out.println("Insert replaySite(blank is not allowed): ");
+						replaySite = sc.nextLine();
+						s.executeUpdate("update Drama set replay_site_link = " + "' " + replaySite +"' where title = '" + title+"'");
+					}catch(SQLException e1)
+					{
+						System.out.println("Please check input again");
+						//System.out.println(e1.getMessage());
+						broadStation = null;
+					}
+				}while(broadStation == null || broadStation.length() <= 0);
+				
+			//===============================================================================================//
+			//================================= insert genre and actors =====================================// 
+				int countGenre = 0;
+				boolean flagGenre = false;
+				do{
+					System.out.println("Insert Genre(horror, comedy, scifi, history, romance, action, q: quit): ");
+					genre = sc.nextLine();
 					try {
-						s.executeUpdate("insert into Genre(drama_id, genre) select id, '" + genre + "' from Drama where title = '" + title + "'");
+						if(genre.length() > 0 && !genre.equalsIgnoreCase("q"))
+						{
+							s.executeUpdate("insert into Genre(drama_id, genre) select id, '" + genre + "' from Drama where title = '" + title + "'");
+						}else if(genre.equalsIgnoreCase("q"))
+						{
+							s.executeQuery("select genre from Genre, Drama where drama_id = id and title = '" + title + "'");
+							ResultSet rs = s.getResultSet();
+							if(rs.next())
+							{
+								flagGenre = true;
+							}else
+							{
+								System.out.println("You should insert at least one genre");
+							}
+						}
+							
 					} catch (SQLException e) {
+						System.out.println("Please check input again");
 						e.printStackTrace();
 					}
-					genre = sc.nextLine();
-				}
+				}while(!flagGenre);
+				
 				
 				System.out.println("Insert main acctors(s: supporting actor, q: quit): ");
 				actors = sc.nextLine();
@@ -97,6 +212,7 @@ public class Officer {
 							actors = sc.nextLine();
 						}
 						try{
+							if(actors!= null && actors.length() >0)
 							s.executeUpdate("insert into Actor(drama_id, name, role) select id, '" + actors + "', 'Supporting'"
 									+ " from Drama where title = '" + title + "'");
 						} catch (SQLException e){
@@ -114,6 +230,7 @@ public class Officer {
 						else
 						{
 							try {
+								if(actors!= null && actors.length() >0)
 								s.executeUpdate("insert into Actor(drama_id, name, role) select id, '" + actors + "', 'Main'"
 										+ " from Drama where title = '" + title + "'");
 							} catch (SQLException e) {

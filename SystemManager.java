@@ -50,19 +50,29 @@ public class SystemManager {
 						input = sc.nextLine(); 
 						if(input.equals("1"))
 						{
-							s.executeQuery("select distinct * from Officer where confirm is null");
-							rs = s.getResultSet();
-							count = 0;
-							do{
-								userId = rs.getString("id");
-								companyName = rs.getString("company_name");
-								employeeNumber = rs.getString("employee_number");
+							try{
+								s.executeQuery("select distinct * from Officer where confirm = 'unknown'");
+								rs = s.getResultSet();
+								count = 0;
+								while(rs.next())
+								{
+									userId = rs.getString("id");
+									companyName = rs.getString("company_name");
+									employeeNumber = rs.getString("employee_number");
+									if(count == 0)
+										System.out.printf("%20s|%12s|%20s\n", "userId", "company name", "employee number");
+									System.out.printf("%20s|%12s|%20s\n", userId, companyName, employeeNumber);	
+									count++;
+								}
 								if(count == 0)
-									System.out.printf("%20s|%12s|%20s\n", "userId", "company name", "employee number");
-								System.out.printf("%20s|%12s|%20s\n", userId, companyName, employeeNumber);	
-								count++;
-							}while(!rs.next());
-							
+								{
+									System.out.println("No new applicant");
+									continue;
+								}
+							}catch(SQLException e1)
+							{
+								System.out.println(e1.getMessage());
+							}
 						/*	if(count == 0)
 							{
 								System.out.println("There is no new information");
@@ -77,7 +87,7 @@ public class SystemManager {
 							while(!input.equals("2") && !input.equalsIgnoreCase("q"))
 							{
 								
-								s.executeQuery("select distinct * from Officer where confirm is null");
+								s.executeQuery("select distinct * from Officer where confirm = 'unknown'");
 								rs = s.getResultSet();
 								for(count = 0; rs.next(); count++)
 								{
@@ -92,30 +102,38 @@ public class SystemManager {
 									input = sc.nextLine();
 									if(input.equalsIgnoreCase("Y"))
 									{
+										try{
 										//accept - update
-										s.executeUpdate("update Officer set confirm = true where id = " + userId);
-										break;
+										s.executeUpdate("update Officer set confirm = 'true' where id = '" + userId+"'");
+										}catch(SQLException e1)
+										{
+											System.out.println(e1.getMessage());
+										}
 										
 									}else if(input.equalsIgnoreCase("N"))
 									{
 									//reject
-										s.executeUpdate("update Officer set confirm = false where id = " + userId);
-										break;
+										try{
+										s.executeUpdate("update Officer set confirm = 'false' where id = '" + userId+"'");
+										}catch(SQLException e2)
+										{
+											System.out.println(e2.getMessage());
+										}
 									}
 									else if(input.equalsIgnoreCase("q"))
 									{
 										break;
 									}
+									s.executeQuery("select distinct * from Officer where confirm = 'unknown'");
+									rs = s.getResultSet();
 								}
 								
-								if(count == 0)
-									System.out.println("No registered officers");
-								else
-									System.out.println("All new applicants are checked");
+								System.out.println("All new applicants are checked");
+								break;
 							}	
 						}else if(input.equals("2"))
 						{
-							s.executeQuery(" select distinct * from Officer where confirm is true");
+							s.executeQuery(" select distinct * from Officer where confirm = 'true'");
 							rs = s.getResultSet();
 							
 							for(count = 0; rs.next(); count++)
@@ -164,12 +182,14 @@ public class SystemManager {
 						{
 							//s.executeQuery("select * from Drama, Genre, Actor where Drama.id = Genre.drama_id and Genre.drama_id = Actor.drama_id");
 							boolean empty = false;
+						
 							do
 							{
-								s.executeQuery("select distinct * from Drama where confirm is null and id > "+ id + " order by id" );
+								
+								s.executeQuery("select distinct * from Drama where confirm = 'unknown' and id > "+ id + " order by id" );
 								rs = s.getResultSet();
 								empty = true;
-								for(count = 0; rs.next(); count++)
+								for(; rs.next(); count++)
 								{
 									empty = false;
 									id = rs.getInt("id");
@@ -181,34 +201,36 @@ public class SystemManager {
 									
 									nextId = rs.getInt("id");
 									if(count == 0)
-									System.out.printf("%3s|%15s|%15s|%15s|%10s|%10s|\n", "id", "title", "writer", 
-											"broadstation", "running time", "age limit");
-									System.out.println("===============================================================================");
-									System.out.printf("%3d|%15s|%15s|%15s|%10d|%10d\n", id, title, writer, 
+									{
+										System.out.printf("%3s|%15s|%15s|%15s|%15s|%10s|%15s|%15s|\n", "id", "title", "writer", 
+												"broadstation", "running time", "age limit", "First aired at", "Last aired at");
+										System.out.println("========================================================================================================================");		
+									}
+									System.out.printf("%3d|%15s|%15s|%15s|%15d|%10d|", id, title, writer, 
 										station, runningTime, ageLimit);
-									System.out.println("First aired: "+rs.getDate("first_aired"));
+									System.out.print(rs.getDate("first_aired") + " |" + rs.getDate("last_aired"));
 									
 									s.executeQuery("select distinct * from Actor where drama_id = " + id);
 									rs = s.getResultSet();
-									for(count = 0; rs.next(); count++)
+									for(int countA = 0; rs.next(); countA++)
 									{
 										actor = rs.getString("name");
-										if(count == 0)
-											System.out.print("Actors: ");
-										System.out.print(" "+actor +", ");
+										if(countA == 0)
+											System.out.printf("\n%3d|%15s|", id, "Actors");
+										System.out.print(" "+actor +" ");
 									}
 									System.out.println("");
 									
 									s.executeQuery("select distinct * from Genre where drama_id = " + id);
 									rs = s.getResultSet();
-									for(count = 0; rs.next(); count++)
+									for(int countG = 0; rs.next(); countG++)
 									{
 										genre = rs.getString("genre");
-										if(count == 0)
-											System.out.print("Genres: ");
-										System.out.print(genre + ", ");
+										if(countG == 0)
+											System.out.printf("%3d|%15s|", id, "Genres");
+										System.out.print(genre + " ");
 									}
-									System.out.println("\n----------------------------------------------------------------------------------");
+									//System.out.println("\n----------------------------------------------------------------------------------");
 									System.out.println("");
 								}
 								
@@ -229,13 +251,13 @@ public class SystemManager {
 									if(input.equalsIgnoreCase("Y"))
 									{
 										//accept - update
-										s.executeUpdate("update Drama set confirm = true where id = " + tempInput);
+										s.executeUpdate("update Drama set confirm = 'true' where id = " + tempInput);
 										break;
 										
 									}else if(input.equalsIgnoreCase("N"))
 									{
 									//reject
-										s.executeUpdate("update Drama set confirm = false where id = " + tempInput);
+										s.executeUpdate("update Drama set confirm = 'false' where id = " + tempInput);
 										break;
 									}
 									else if(input.equalsIgnoreCase("q"))
@@ -245,7 +267,7 @@ public class SystemManager {
 								}
 						}else if(input.equals("2"))
 						{
-							s.executeQuery("select distinct * from Drama where confirm is true" );
+							s.executeQuery("select distinct * from Drama where confirm = 'true'" );
 							rs = s.getResultSet();
 							for(count = 0; rs.next(); count++)
 							{
